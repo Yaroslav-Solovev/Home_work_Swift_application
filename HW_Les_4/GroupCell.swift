@@ -27,10 +27,27 @@ final class GroupCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func updateCell(model: Group){
+        title.text = model.name
+        subtitle.text = model.description
+
+        DispatchQueue.global().async{
+            if let url = URL(string: model.photo ?? ""), let data = try?
+                Data(contentsOf: url)
+            {
+                DispatchQueue.main.async{
+                    self.groupImageView.image = UIImage(data: data)
+                }
+            }
+        }
+    }
+
+
     private func setupViews(){
         contentView.addSubview(groupImageView)
         contentView.addSubview(title)
         contentView.addSubview(subtitle)
+        groupImageView.addSubview(onlineCircle)
         setupConstraints()
     }
 

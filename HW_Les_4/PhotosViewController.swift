@@ -2,20 +2,35 @@ import UIKit
 
 final class PhotosViewController: UITableViewController {
     private let NetworkService = NetworkService()
+    private var models: [Photo] = []
     
     override func viewDidLoad(){
         super.viewDidLoad()
         title = "Photos"
         collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: Constants.Identifier.photoCellIdentifier)
-        networkService.getPhotos()
+        tableView.register(PhotoCell.self, forCellReuseIndentifier: "PhotoCell")
+        networkService.getPhotos{ [weak self] photos in 
+            self?.models = photos
+            DispatchQueue.main.async{
+                self?.tableView.reloadData()
+            }}
     }
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{return 6}
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int{
+        models.count
+    }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell{GroupCell()}
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIndentifier: Constants.Identifier.photoCellIdentifier, for: indexPath) as! PhotoCell
-        return cell
+        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell{
+            guard let cell = collectionView.dequeueReusableCell(withIndentifier: 
+            Constants.Identifier.photoCellIndentifier, for: indexPath) as? PhotoCell else {
+                return UICollectionViewCell()
+            }
+            let model = models[indexPath.row]
+            cell.updateCell(model: model)
+            return cell
+        }
     }
 }
 
