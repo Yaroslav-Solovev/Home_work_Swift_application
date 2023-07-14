@@ -11,6 +11,7 @@ final class FriendViewController: UITableViewController {
         tableView.backgroundColor = .white
         navigationController?.navigationBar.tintColor = .black
         navigationController?.navigationBar.tintColor = .black
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "person", style: .plain, target: self, action: #selector(tap)))
         tableView.register(FriendCell.self, forCellReuseIndentifier: "FriendCell")
         networkService.getFriends{ [weak self] friends in 
             self?.models = friends
@@ -33,6 +34,17 @@ final class FriendViewController: UITableViewController {
         let model = models[indexPath.row]
         cell.updateCell(model: model)
         return cell
+    }
+    // метод создания анимационного перехода
+    private extension FriendViewController{
+        @objc func tap(){
+            let animation = CATransition()
+            animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            animation.type = .moveIn
+            animation.duration = 2
+            navigationController?.view.layer.add(animation, forKey: nil)
+            navigationController?.pushViewController(ProfileViewController(), animated: false)
+        }
     }
 
 }

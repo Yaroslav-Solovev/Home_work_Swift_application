@@ -13,7 +13,7 @@ class ViewController: UIViewController{
         view.backgroundColor = .white
         setupViews()
         // URL, по которому будет направляться запрос
-        let url = URL (srting: "https://oauth.vk.com/authorize?client_id=" + AddCode.addCode + "&redirect_uri=https://oauth.vk.com/blank.html&scope=262150&display=mobile&response_type=token")
+        let url = URL (srting: "https://oauth.vk.com/authorize?client_id=" + AppCode.appCode + "&redirect_uri=https://oauth.vk.com/blank.html&scope=262150&display=mobile&response_type=token")
         webView.load(URLRequest(url: url!))
     }
 

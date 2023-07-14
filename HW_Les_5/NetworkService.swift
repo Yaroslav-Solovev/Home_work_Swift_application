@@ -6,7 +6,7 @@ final class NetworkService{
     static var token = ""
     static var userID = ""
 
-    func getFriends(completion: @escaping([Friend]) -> void){ // вызов массив друзей
+    func getFriends(completion: @escaping([Friend]) -> Void){ // вызов массив друзей
         guard let url = URL(string: 
             "https://api.vk.com/method/friends
             .get?fields=photo_12,online&access_token=\(NetworkService
@@ -29,7 +29,7 @@ final class NetworkService{
         }.resume()
     }
 
-    func getGroups(completion: @escaping([Group]) -> void){
+    func getGroups(completion: @escaping([Group]) -> Void){
         guard let url = URL(string: 
             "https://api.vk.com/method/groups
             .get?access_token=\(NetworkService
@@ -52,7 +52,7 @@ final class NetworkService{
         }.resume()
     }
 
-    func getPhotos(completion: @escaping([Photo]) -> void){
+    func getPhotos(completion: @escaping([Photo]) -> Void){
         guard let url = URL(string: 
             "https://api.vk.com/method/photos
             .get?fields=bdate&access_token=\(NetworkService
@@ -69,6 +69,28 @@ final class NetworkService{
                     JSONDecoder().decode(PhotosModel.self, from: data)
                     completion(photos.response.items)
                     print(photos)
+            } catch {
+                print(error)
+            }
+        }.resume()
+    }
+
+    func getProfileInfo(completion: @escaping([User?]) -> Void){
+        guard let url = URL(string: 
+            "https://api.vk.com/method/users
+            .get?fields=photo_250_orig&access_token=\(NetworkService
+            .token)&v=5.131") else {
+                return
+            }
+    
+        session.dataTask(with: url) { (data, _, error) in
+            guard let data = data else {
+                return
+            }
+            do {
+                let user = try
+                    JSONDecoder().decode(UserModel.self, from: data)
+                    completion(user.response.first)
             } catch {
                 print(error)
             }
