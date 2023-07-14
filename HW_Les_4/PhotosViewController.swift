@@ -1,7 +1,7 @@
 import UIKit
 
 final class PhotosViewController: UITableViewController {
-    private let NetworkService = NetworkService()
+    private let networkService = NetworkService()
     private var models: [Photo] = []
     
     override func viewDidLoad(){

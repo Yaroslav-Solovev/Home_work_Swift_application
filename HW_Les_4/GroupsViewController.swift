@@ -1,7 +1,7 @@
 import UIKit
 
 final class GroupsViewController: UITableViewController {
-    private let NetworkService = NetworkService()
+    private let networkService = NetworkService()
     private var models: [Group] = []
 
     override func viewDidLoad(){

@@ -1,7 +1,7 @@
 import UIKit
 
 final class FriendViewController: UITableViewController {
-    private let NetworkService = NetworkService()
+    private let networkService = NetworkService()
     private var models: [Friend] = []
     
     override func viewDidLoad(){
