@@ -3,21 +3,22 @@ import UIKit
 final class FriendViewController: UITableViewController {
     private let networkService = NetworkService()
     private var models: [Friend] = []
+    private var fileCache = FileCache()
     
     override func viewDidLoad(){
         super.viewDidLoad()
+        models = fileCache.fetchFriends()
+        tableView.reloadData()
         title = "Friends"
-        view.backgroundColor = .white
-        tableView.backgroundColor = .white
+        view.backgroundColor = Theme.currentTheme.backgroundColor
+        tableView.backgroundColor = Theme.currentTheme.backgroundColor
         navigationController?.navigationBar.tintColor = .black
         navigationController?.navigationBar.tintColor = .black
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "person", style: .plain, target: self, action: #selector(tap)))
         tableView.register(FriendCell.self, forCellReuseIndentifier: "FriendCell")
-        networkService.getFriends{ [weak self] friends in 
-            self?.models = friends
-            DispatchQueue.main.async{
-                self?.tableView.reloadData()
-            }}
+        refreshControl = UIRefreshControl()
+        refreshControl?.addTarget(self, action: #selector(update), for: .valueChanged)
+        getFriends()
     }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
         models.count
@@ -33,7 +34,30 @@ final class FriendViewController: UITableViewController {
         }
         let model = models[indexPath.row]
         cell.updateCell(model: model)
+        cell.tap = { [weak self] text, photo in
+            self?.navigationController?
+                .pushViewController(ProfileViewcontroller(name: text, 
+                photo: photo, isUserProfile: false), animated: true)
+        }
         return cell
+    }
+
+    func getFriends(){
+        networkService.getFriends{ [weak self] result in switch result{
+            case .success(let friends):
+                self?.models = friends
+                self?.fileCache.addFriends(friends: friends)
+                DispatchQueue.main.async{
+                    self?.tableView.reloadData()
+                }
+            case .failure(_):
+                self?.models = self?.fileCache.fetchFriends() ?? []
+                DispatchQueue.main.async{
+                    self?.showAlert()
+                    self?.tableView.reloadData()
+                }
+            }
+        }
     }
     // метод создания анимационного перехода
     private extension FriendViewController{
@@ -43,8 +67,37 @@ final class FriendViewController: UITableViewController {
             animation.type = .moveIn
             animation.duration = 2
             navigationController?.view.layer.add(animation, forKey: nil)
-            navigationController?.pushViewController(ProfileViewController(), animated: false)
+            navigationController?.pushViewController(ProfileViewController(isUserProfile: true), animated: false)
+        }
+
+        @objc func update(){
+            networkService.getFriends{ [weak self] result in switch result{
+                case .success(let friends):
+                    self?.models = friends
+                    self?.fileCache.addFriends(friends: friends)
+                    DispatchQueue.main.async{
+                        self?.tableView.reloadData()
+                }
+                case .failure(_):
+                    self?.models = self?.fileCache.fetchFriends() ?? []
+                    DispatchQueue.main.async{
+                        self?.showAlert()
+                        self?.tableView.reloadData()
+                }
+                DispatchQueue.main.async{
+                    self?.refreshControl?.endRefreshing()
+                }     
+            }
+        }
+    } 
+
+    private extension FriendViewController{
+        func showAlert(){
+            let date = DateHelper.getDate(date: fileCache.fetchFriendDate())
+            let alert = UIAlertController(title: "Failed to get data", 
+            message: "Data is up to date \(date)", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Exit", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
         }
     }
-
 }

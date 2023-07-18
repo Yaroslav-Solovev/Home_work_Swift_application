@@ -11,12 +11,30 @@ final class ProfileViewController: UIViewController {
         return label
     } ()
 
+    private var themeView = Theme View()
+    private var isUserProfile: Bool
+
+    init(name: String? = nil, photo: UIImage? = nil, isUserProfile: Bool){
+        self.isUserProfile = isUserProfile
+        super.init(nibName: nil, bundle: nil)
+        nameLabel.text = name
+        profileImageView.image = photothemeView.delegate = self
+    }
+
+    required init?(coder: NSCoder){
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func viewDidLoad(){
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = Theme.currentTheme.backgroundColor
         setupViews()
-        networkService.getProfileInfo{ 
-            [weak self] user in self?.updateData(model: user)
+        if isUserProfile{
+            networkService.getProfileInfo{ 
+                [weak self] user in self?.updateData(model: user)
+            }
+        } else {
+            themeView.isHidden = true
         }
     }
 
@@ -34,12 +52,14 @@ final class ProfileViewController: UIViewController {
     private func setupViews(){
         view.addSubview(profileImageView)
         view.addSubview(nameLabel)
+        view.addSubview(themeView)
         setupConstraints()
     }
 
     private func setupConstraints(){
         profileImageView.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        themeView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             profileImageView.centerYAnchor.contraint(equalTo: view.centerYAnchor, constant: -50)
@@ -49,7 +69,19 @@ final class ProfileViewController: UIViewController {
 
             nameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30)
             nameLabel.trailingAnchor.contraint(equalTo: view.trailingAnchor, constant: -30)
-            nameLabel.topAnchor.contraint(equalTo: profileImageView..bottomAnchor, constant: 30)
+            nameLabel.topAnchor.contraint(equalTo: profileImageView.bottomAnchor, constant: 30)
+
+            themeView.leadingAnchor.contraint(equalTo: view.leadingAnchor)
+            themeView.trailingAnchor.contraint(equalTo: view.trailingAnchor)
+            themeView.topAnchor.contraint(equalTo: nameLabel.bottomAnchor, constant: 30)
+            themeView.bottomAnchor.contraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
         ])
+    }
+}
+
+extension ProfileViewController: ThemeViewDelegate{
+    func updateColor(){
+        view.backgroundColor = Theme.currentTheme.backgroundColor
+        nameLabel.textColor = Theme.currentTheme.textColor
     }
 }

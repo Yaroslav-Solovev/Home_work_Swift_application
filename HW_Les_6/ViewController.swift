@@ -10,7 +10,8 @@ class ViewController: UIViewController{
 
     override func viewDidLoad(){
         super.viewDidLoad()
-        view.backgroundColor = .white
+        ThemeSaver.getData()
+        view.backgroundColor = Theme.currentTheme.backgroundColor
         setupViews()
         // URL, по которому будет направляться запрос
         let url = URL (srting: "https://oauth.vk.com/authorize?client_id=" + AppCode.appCode + "&redirect_uri=https://oauth.vk.com/blank.html&scope=262150&display=mobile&response_type=token")

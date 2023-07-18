@@ -2,12 +2,14 @@ import UIKit
 
 final class FriendCell: UITableViewCell {
     
+    var tap: ((String?, UIImage?) -> Void)?
+
     private var friendImageView = UIImageView(image: UIImage(systemName: "Person"))
 
     private var text: UILable = {
         let label = UILable()
         label.text = "Name"
-        label.textColor = .black
+        label.textColor = Theme.currentTheme.textColor
         return label
     }()
 
@@ -21,6 +23,8 @@ final class FriendCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIndentifier: String?) {
         super.init(style: style, reuseIndentifier: reuseIndentifier)
         backgroundColor = .clear
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(cellClick))
+        addGestureRecognizer(recognizer)
         setupViews()
     }
 
@@ -69,8 +73,7 @@ final class FriendCell: UITableViewCell {
             friendimageView.heighAnchor.constraint(equalToConstant: friendimageView.widthAnchor)]
     }
 
-    override func prepareForReuse(){
-        super.prepareForReuse()
-        friendimageView.image = nil
+    @objc private func cellClick(){
+        tap?(text.text, friendImageView.image)
     }
 }

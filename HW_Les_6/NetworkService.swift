@@ -6,7 +6,7 @@ final class NetworkService{
     static var token = ""
     static var userID = ""
 
-    func getFriends(completion: @escaping([Friend]) -> Void){ // вызов массив друзей
+    func getFriends(completion: @escaping(Result<[Friend], Error) -> Void){ // вызов массив друзей
         guard let url = URL(string: 
             "https://api.vk.com/method/friends
             .get?fields=photo_12,online&access_token=\(NetworkService
@@ -16,6 +16,11 @@ final class NetworkService{
         
         session.dataTask(with: url) { (data, _, error) in
             guard let data = data else {
+                completion(.failure(NetworkError.dataError))
+                return
+            }
+            if let error = error{
+                completion(.failure(error))
                 return
             }
             do {

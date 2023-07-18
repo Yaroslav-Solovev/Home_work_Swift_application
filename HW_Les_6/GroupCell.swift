@@ -7,7 +7,7 @@ final class GroupCell: UITableViewCell {
     private var title: UILable = {
         let label = UILable()
         label.text = "Name"
-        label.textColor = .black
+        label.textColor = Theme.currentTheme.textColor
         return label
     }()
 
