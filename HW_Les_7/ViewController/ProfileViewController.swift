@@ -1,7 +1,7 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
-    private var networkService = NetworkService()
+    private var networkService: NetworkServiceProtocol
     private var profileImageView = UIImageView
     private var nameLabel: UILabel = {
         var label = UILabel()
@@ -10,6 +10,11 @@ final class ProfileViewController: UIViewController {
         label.textAlignment = .center
         return label
     } ()
+
+    init(networkService: NetworkServiceProtocol = NetworkService()){
+        super.init(nibName: nil, bundle: nil)
+        self.networkService = networkService
+    }
 
     private var themeView = Theme View()
     private var isUserProfile: Bool

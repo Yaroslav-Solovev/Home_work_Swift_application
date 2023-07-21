@@ -1,7 +1,29 @@
 import Foundation
 import CoreData
 
-final class FileCache {
+protocol FileCacheProtocol{
+    lazy var persistentContainer: NSPersistentContainer = {
+        let persistentContainer = NSPersistentContainer(name: "DataModel")
+        persistentContainer.loadPersistentStores(completionHandler: {
+            (_, error) in if let error = error{
+                print(error)
+            }
+        })
+        return persistentContainer
+    }()
+    func save()
+    func delete(object: NSManagedObject)
+    func addFriends(friends: [Friend])
+    func fetchFriends() -> [Friend]
+    func addGroups(groups: [Group])
+    func fetchGroups() -> [Group]
+    func addFriendDate()
+    func fetchFriendDate()-> Date?
+    func addGroupDate()
+    func fetchGroupDate()-> Date?
+}
+
+final class FileCache: FileCacheProtocol {
     lazy var persistentContainer: NSPersistentContainer = {
         let persistentContainer = NSPersistentContainer(name: "DataModel")
         persistentContainer.loadPersistentStores(completionHandler: {
